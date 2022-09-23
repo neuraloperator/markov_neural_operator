@@ -11,10 +11,15 @@ In this work, we propose a machine learning framework, which we call the Markov 
 TODO
 
 ## Datasets
-In our paper, we train and evaluate on datasets from the Lorenz-63 system, Kuramoto–Sivashinsky equation, and the 2D Navier-Stokes equations (Kolmogorov flow).
+In our work, we train and evaluate on datasets from the Lorenz-63 system (finite-dimensional ODE), Kuramoto–Sivashinsky equation (1D PDE system), and the 2D Navier-Stokes equations (Kolmogorov flow, 2D PDE).
 * Lorenz:
 * KS:
 * Data generation for 2D Navier-Stokes is based on the data generation scripts in the [FNO repository](https://github.com/zongyi-li/fourier_neural_operator/tree/master/data_generation/navier_stokes).
+
+## Models
+In our work, we use three different models to learn the Markovian solution operator. These can be found under the ``models/`` folder in the repository.
+* **Lorenz:** Since the Lorenz-63 system is a finite-dimensional ODE system, we use a 
+* **1D KS and 2D NS equations:** We interpret PDEs as function-space ODEs, and we adopt the 1D and 2D FNO architecture (resp.) to learn the Markov solution operator for the 1D KS and 2D NS equations.
 
 ## Citations
 TODO
