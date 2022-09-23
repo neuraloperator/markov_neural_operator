@@ -8,7 +8,11 @@ In this work, we propose a machine learning framework, which we call the Markov 
 * Neural operator code is based on the [Fourier Neural Operator (FNO)](https://github.com/zongyi-li/fourier_neural_operator), which requires PyTorch 1.8.0 or later.
 
 ## Files
-TODO
+* ``utilities.py``: basic utilities including a reader for .mat files and Sobolev (Hk) and Lp losses.
+* ``dissipative_utils.py``: helper functions for encouraging dissipative dynamics.
+* ``models/``: model architectures
+    * ``densenet.py``: simple feedforward neural network
+    *  ``fno_2d.py``: FNO architecture for operators acting on a function space with two spatial dimensions.
 
 ## Datasets
 In our work, we train and evaluate on datasets from the Lorenz-63 system (finite-dimensional ODE), Kuramoto–Sivashinsky equation (1D PDE system), and the 2D Navier-Stokes equations (Kolmogorov flow, 2D PDE).
