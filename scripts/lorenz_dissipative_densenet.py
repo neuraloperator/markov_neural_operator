@@ -9,18 +9,26 @@ import scipy.io
 import sys
 sys.path.append('../')
 from utilities import *
+from dissipativity_utils import sample_uniform_spherical_shell, linear_scale_dissipative_target
 
 sys.path.append('../models')
 from densenet import *
 
 torch.manual_seed(0)
 np.random.seed(0)
-device = torch.device('cuda')
 
 # Main
 ntrain = 160000
 ntest = 38000
 scale_inputs = False
+
+# DISSIPATIVE REGULARIZATION PARAMETERS
+scale_down = 0.5 # rate at which to linearly scale down inputs
+radius = 90 # radius of inner ball
+loss_weight = 1 # weighting term between data loss and dissipativity term
+radii = (radius, radius + 40) # inner and outer radii
+sampling_fn = sample_uniform_spherical_shell # numsamples is batch size
+target_fn = linear_scale_dissipative_target
 
 in_dim = 3
 out_dim = 3
@@ -29,7 +37,7 @@ batch_size = 256
 epochs = 1000
 learning_rate = 0.0005
 
-layers = [in_dim, in_dim*50, in_dim*50,  in_dim*50, in_dim*50, in_dim*50, in_dim*50, out_dim] # list of layer widths
+layers = [in_dim, in_dim*50, in_dim*50,  in_dim*50, in_dim*50, in_dim*50, in_dim*50, out_dim]
 nonlinearity = nn.ReLU
 
 rel_loss = True # relative Lp loss
@@ -44,8 +52,8 @@ print("Scheduler step:", scheduler_step)
 print("Scheduler gamma:", scheduler_gamma)
 print()
 
-path = 'lorenz_densenet_relu_dt_0_05'+str(ntrain)+'_ep' + str(epochs) + '_lr' + str(learning_rate).replace('.','_') + '_schedstep' + str(scheduler_step).replace('.','_') + '_relLp' + str(rel_loss) + '_layers' + str(layers)[1:-1].replace(', ', '_')
-path_model = 'weights/'+path
+path = 'lorenz_dissipative_densenet_dt_0_05_inner_rad'+str(int(radius))+'_outer_rad'+str(int(radii[1]))+'_lambda'+str(scale_down).replace('.','_')+'_diss_weight'+str(loss_weight).replace('.','_')+'_time'+str(ntrain)+'_ep' + str(epochs) + '_lr' + str(learning_rate).replace('.','_') + '_schedstep' + str(scheduler_step).replace('.','_') + '_relLp' + str(rel_loss) + '_layers' + str(layers)[1:-1].replace(', ', '_')
+path_model = 'model/'+path
 print(path)
 
 # Data
@@ -85,6 +93,7 @@ t2 = default_timer()
 
 print('preprocessing finished, time used:', t2-t1)
 print()
+device = torch.device('cuda')
 
 # Model
 model = DenseNet(layers, nonlinearity).cuda()
@@ -97,32 +106,46 @@ scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=scheduler_step,
 
 if rel_loss:
     trainloss = LpLoss(size_average=False)
+    dissloss = LpLoss(size_average=False)
     testloss = LpLoss(size_average=False)
+    test_dissloss = LpLoss(size_average=False)
     testloss_1sec = LpLoss(size_average=False)
 else:
     trainloss = nn.MSELoss(reduction='sum')
+    dissloss = nn.MSELoss(reduction='sum')
     testloss = nn.MSELoss(reduction='sum')
+    test_dissloss = nn.MSELoss(reduction='sum')
     testloss_1sec = nn.MSELoss(reduction='sum')
 
-# Begin train
 for ep in range(1, epochs + 1):
     model.train()
     t1 = default_timer()
-    train_l2 = 0
     one_sec_count = 0
+    train_l2 = 0
+    diss_l2 = 0
     for x, y in train_loader:
         x = x.to(device).view(-1, out_dim)
         y = y.to(device).view(-1, out_dim)
 
         out = model(x).reshape(-1, out_dim)
-        loss = trainloss(out, y)
-        train_l2 += loss.item()
+        data_loss = trainloss(out, y)
+        train_l2 += data_loss.item()
+
+        x_diss = torch.tensor(sampling_fn(x.shape[0], radii), dtype=torch.float).to(device)
+        assert(x_diss.shape == x.shape)
+        y_diss = torch.tensor(target_fn(x_diss, scale_down), dtype=torch.float).to(device)
+        out_diss = model(x_diss).reshape(-1, out_dim)
+        diss_loss = loss_weight*dissloss(out_diss, y_diss) # weighted
+        diss_l2 += diss_loss.item()
+
+        loss = data_loss + diss_loss
 
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
     test_l2 = 0
+    test_diss_l2 = 0
     test_l2_1_sec = 0
     with torch.no_grad():
         for x, y in test_loader:
@@ -131,6 +154,13 @@ for ep in range(1, epochs + 1):
 
             out = model(x).reshape(-1, out_dim)
             test_l2 += testloss(out, y).item()
+
+            x_diss = torch.tensor(sampling_fn(x.shape[0], radii), dtype=torch.float).to(device)
+            assert(x_diss.shape == x.shape)
+            y_diss = torch.tensor(target_fn(x_diss, scale_down), dtype=torch.float).to(device)
+            out_diss = model(x_diss).reshape(-1, out_dim)
+            test_diss_loss = test_dissloss(out_diss, y_diss) # unweighted
+            test_diss_l2 += test_diss_loss.item()
 
             x_subsample = x[::steps_per_sec]
             x_1sec = x_subsample[:-2] # inputs
@@ -144,7 +174,7 @@ for ep in range(1, epochs + 1):
 
     t2 = default_timer()
     scheduler.step()
-    print("Epoch " + str(ep) + " completed in " + "{0:.{1}f}".format(t2-t1, 3) + " seconds. Train L2 err:", "{0:.{1}f}".format(train_l2/(ntrain), 3), "Test L2 err:", "{0:.{1}f}".format(test_l2/(ntest), 3), "Test L2 err over 1 sec:", "{0:.{1}f}".format(test_l2_1_sec/(one_sec_count), 3))
+    print("Epoch " + str(ep) + " completed in " + "{0:.{1}f}".format(t2-t1, 3) + " seconds. Train L2 err:", "{0:.{1}f}".format(train_l2/(ntrain), 3), "Test L2 err:", "{0:.{1}f}".format(test_l2/(ntest), 3), "Train diss. err:",  "{0:.{1}f}".format(diss_l2/(ntrain), 3), "Test diss. err:",  "{0:.{1}f}".format(test_diss_l2/(ntest), 3), "Test L2 err over 1 sec:", "{0:.{1}f}".format(test_l2_1_sec/(one_sec_count), 3))
 
 torch.save(model, path_model)
 print("Weights saved to", path_model)
