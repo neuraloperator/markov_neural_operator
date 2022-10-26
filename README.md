@@ -19,8 +19,8 @@ In this work, we propose a machine learning framework, which we call the Markov 
     * ``lorenz_densenet.py``: simple feedforward neural network learning Markovian solution operator for Lorenz-63 system. 
     * ``lorenz_dissipative_densenet.py``: simple feedforward neural network with dissipativity encouraged trained on Lorenz-63 system.
     * KS: TODO
-* ``visualization/``: notebooks and examples to reproduce plots and figures found in our paper.
-    * `lorenz.ipynb`: Jupyter notebook with examples to reproduce plots and figures for our Lorenz-63 examples in the paper.
+* `lorenz.ipynb`: Jupyter notebook with examples to reproduce plots and figures for our Lorenz-63 examples in the paper.
+* `visualize_navier_stokes2d.ipynb` : Jupyter notebook with examples to reproduce plots and figures for our 2D Navier-Stokes case study in the paper.
 
 ## Datasets
 In our work, we train and evaluate on datasets from the Lorenz-63 system (finite-dimensional ODE), Kuramoto–Sivashinsky equation (1D PDE system), and the 2D Navier-Stokes equations (Kolmogorov flow, 2D PDE). Our datasets can be found at online under DOI (TODO).
