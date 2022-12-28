@@ -1,6 +1,6 @@
 # Markov Neural Operator (MNO)
 
-This repository contains the code for the paper "Learning Dissipative Dynamics in Chaotic Systems," published in NeurIPS 2022.
+This repository contains the code for the paper ["Learning Dissipative Dynamics in Chaotic Systems,"]([url](https://arxiv.org/abs/2106.06898)) published in NeurIPS 2022.
 
 In this work, we propose a machine learning framework, which we call the Markov Neural Operator (MNO), to learn the underlying solution operator for dissipative chaotic systems, showing that the resulting learned operator accurately captures short-time trajectories and long-time statistical behavior. Using this framework, we are able to predict various statistics of the invariant measure for the turbulent Kolmogorov Flow dynamics with Reynolds numbers up to 5000.
 
