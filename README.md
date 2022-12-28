@@ -33,5 +33,4 @@ In our work, we use three different models to learn the Markovian solution opera
 * **Lorenz:** Since the Lorenz-63 system is a finite-dimensional ODE system, we use a standard feedforward neural network to learn the Markov solution operator.
 * **1D KS and 2D NS equations:** We interpret PDEs as function-space ODEs, and we adopt the 1D and 2D FNO architecture (resp.) to learn the Markov solution operator for the 1D KS and 2D NS equations.
 
-## Citations
-TODO
+## Citation
