@@ -13,6 +13,7 @@ In this work, we propose a machine learning framework, which we call the Markov 
 * ``models/``: model architectures
     * ``densenet.py``: simple feedforward neural network
     *  ``fno_2d.py``: FNO architecture for operators acting on a function space with two spatial dimensions.
+* ``data_generation/``: directory containing data generation code for our toy Lorenz-63 dataset and the 1D Kuramoto–Sivashinsky PDE.
 * ``scripts/``: scripts for training Lorenz-63 model, 1D KS, and 2D NS equations.
     * ``NS_fno_baseline.py``: FNO baseline trained on 2D NS with Reynolds number 500. No dissipativity or Sobolev loss.
     * ``NS_mno_dissipative.py``: MNO model built on FNO architecture with dissipativity encouraged and Sobolev loss.
@@ -22,9 +23,9 @@ In this work, we propose a machine learning framework, which we call the Markov 
 * `visualize_navier_stokes2d.ipynb` : Jupyter notebook with examples to reproduce plots and figures for our 2D Navier-Stokes case study in the paper.
 
 ## Datasets
-In our work, we train and evaluate on datasets from the Lorenz-63 system (finite-dimensional ODE), Kuramoto–Sivashinsky equation (1D PDE system), and the 2D Navier-Stokes equations (Kolmogorov flow, 2D PDE). Our datasets can be found online under DOI (TODO).
-* Lorenz:
-* KS:
+In our work, we train and evaluate on datasets from the Lorenz-63 system (finite-dimensional ODE), Kuramoto–Sivashinsky equation (1D PDE system), and the 2D Navier-Stokes equations (Kolmogorov flow, 2D PDE). Our datasets can be found online under DOI [10.5281/zenodo.74955555](https://zenodo.org/record/7495555).
+* Lorenz: Can be found in the `data_generation` directory.
+* KS: Can be found in the `data_generation` directory.
 * Data generation for 2D Navier-Stokes is based on the data generation scripts in the [FNO repository](https://github.com/zongyi-li/fourier_neural_operator/tree/master/data_generation/navier_stokes).
 
 ## Models
@@ -33,3 +34,10 @@ In our work, we use three different models to learn the Markovian solution opera
 * **1D KS and 2D NS equations:** We interpret PDEs as function-space ODEs, and we adopt the 1D and 2D FNO architecture (resp.) to learn the Markov solution operator for the 1D KS and 2D NS equations.
 
 ## Citation
+```
+@inproceedings{MNO,
+  title={Learning Dissipative Dynamics in Chaotic Systems},
+  author={Zongyi Li and Miguel Liu-Schiaffini and Nikola B. Kovachki and Burigede Liu and Kamyar Azizzadenesheli and Kaushik Bhattacharya and Andrew Stuart and Anima Anandkumar},
+  year={2022}
+}
+```
