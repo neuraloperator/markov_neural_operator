@@ -13,6 +13,58 @@ from functools import reduce
 #################################################
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+# PCA
+class PCA(object):
+    def __init__(self, x, dim, subtract_mean=True):
+        super(PCA, self).__init__()
+
+        # Input size
+        x_size = list(x.size())
+
+        # Input data is a matrix
+        assert len(x_size) == 2
+
+        # Reducing dimension is less than the minimum of the
+        # number of observations and the feature dimension
+        assert dim <= min(x_size)
+
+        self.reduced_dim = dim
+
+        if subtract_mean:
+            self.x_mean = torch.mean(x, dim=0).view(1, -1)
+        else:
+            self.x_mean = torch.zeros((x_size[1],), dtype=x.dtype, layout=x.layout, device=x.device)
+
+        # SVD
+        U, S, V = torch.svd(x - self.x_mean)
+        V = V.t()
+
+        # Flip sign to ensure deterministic output
+        max_abs_cols = torch.argmax(torch.abs(U), dim=0)
+        signs = torch.sign(U[max_abs_cols, range(U.size()[1])]).view(-1, 1)
+        V *= signs
+
+        self.W = V.t()[:, 0:self.reduced_dim]
+        self.sing_vals = S.view(-1, )
+
+    def cuda(self):
+        self.W = self.W.cuda()
+        self.x_mean = self.x_mean.cuda()
+        self.sing_vals = self.sing_vals.cuda()
+
+    def encode(self, x):
+        return (x - self.x_mean).mm(self.W)
+
+    def decode(self, x):
+        return x.mm(self.W.t()) + self.x_mean
+
+    def forward(self, x):
+        return self.decode(self.encode(x))
+
+    def __call__(self, x):
+        return self.forward(x)
+
+
 # reading data
 class MatReader(object):
     def __init__(self, file_path, to_torch=True, to_cuda=False, to_float=True):
