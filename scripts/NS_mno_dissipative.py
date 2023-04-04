@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import sys
 sys.path.append('../')
 from utilities import *
-from dissipativity_utils import sample_uniform_spherical_shell, linear_scale_dissipative_target
+from dissipative_utils import sample_uniform_spherical_shell, linear_scale_dissipative_target
 
 sys.path.append('../models')
 from fno_2d import *
@@ -108,7 +108,7 @@ for ep in range(1, epochs + 1):
         data_loss = myloss(out, y)
         train_loss += data_loss.item()
 
-        x_diss = torch.tensor(sampling_fn(x.shape[0], radii), dtype=torch.float).to(device)
+        x_diss = torch.tensor(sampling_fn(x.shape[0], radii, (S, S, 1)), dtype=torch.float).to(device)
         assert(x_diss.shape == x.shape)
         y_diss = torch.tensor(target_fn(x_diss, scale_down), dtype=torch.float).to(device)
         out_diss = model(x_diss).reshape(-1, out_dim)

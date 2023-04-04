@@ -9,7 +9,7 @@ import scipy.io
 import sys
 sys.path.append('../')
 from utilities import *
-from dissipativity_utils import sample_uniform_spherical_shell, linear_scale_dissipative_target
+from dissipative_utils import sample_uniform_spherical_shell, linear_scale_dissipative_target
 
 sys.path.append('../models')
 from densenet import *
@@ -131,7 +131,7 @@ for ep in range(1, epochs + 1):
         data_loss = trainloss(out, y)
         train_l2 += data_loss.item()
 
-        x_diss = torch.tensor(sampling_fn(x.shape[0], radii), dtype=torch.float).to(device)
+        x_diss = torch.tensor(sampling_fn(x.shape[0], radii, (in_dim,)), dtype=torch.float).to(device)
         assert(x_diss.shape == x.shape)
         y_diss = torch.tensor(target_fn(x_diss, scale_down), dtype=torch.float).to(device)
         out_diss = model(x_diss).reshape(-1, out_dim)
@@ -155,7 +155,7 @@ for ep in range(1, epochs + 1):
             out = model(x).reshape(-1, out_dim)
             test_l2 += testloss(out, y).item()
 
-            x_diss = torch.tensor(sampling_fn(x.shape[0], radii), dtype=torch.float).to(device)
+            x_diss = torch.tensor(sampling_fn(x.shape[0], radii, (in_dim,)), dtype=torch.float).to(device)
             assert(x_diss.shape == x.shape)
             y_diss = torch.tensor(target_fn(x_diss, scale_down), dtype=torch.float).to(device)
             out_diss = model(x_diss).reshape(-1, out_dim)

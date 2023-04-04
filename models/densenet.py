@@ -1,5 +1,8 @@
 import torch
 import numpy as np
+import torch.nn as nn
+from functools import reduce
+import operator
 
 # A simple feedforward neural network
 class DenseNet(torch.nn.Module):
@@ -29,3 +32,10 @@ class DenseNet(torch.nn.Module):
             x = l(x)
 
         return x
+
+    def count_params(self):
+        c = 0
+        for p in self.parameters():
+            c += reduce(operator.mul, list(p.size()))
+
+        return c
