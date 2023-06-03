@@ -42,4 +42,4 @@ rho: partition of unity, a map from R to [0,1]
 diss: baseline dissipative map from R^n to R^n
 """
 def part_unity_post_process(x, model, rho, diss):
-    return rho(torch.norm(x)) * model(x).reshape(x.shape[0],) + (1 - rho(x)) * diss(x)
+    return rho(torch.norm(x)) * model(x).reshape(x.shape[0],) + (1 - rho(torch.norm(x))) * diss(x)
