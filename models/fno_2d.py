@@ -53,14 +53,14 @@ class SpectralConv2d(nn.Module):
         return x
 
 class SimpleBlock2d(nn.Module):
-    def __init__(self, in_dim, out_dim, modes1, modes2, width):
+    def __init__(self, in_dim, out_dim, domain_size, modes1, modes2, width): # assumes square domain
         super(SimpleBlock2d, self).__init__()
 
         self.modes1 = modes1
         self.modes2 = modes2
 
         self.width_list = [width*2//4, width*3//4, width*4//4, width*4//4, width*5//4]
-        self.size_list = [64,] * 5
+        self.size_list = [domain_size] * 5
         self.grid_dim = 2
 
         self.fc0 = nn.Linear(in_dim+self.grid_dim, self.width_list[0])
@@ -129,9 +129,9 @@ class SimpleBlock2d(nn.Module):
         return torch.cat((gridx, gridy), dim=1).to(device)
 
 class Net2d(nn.Module):
-    def __init__(self, in_dim, out_dim, modes, width):
+    def __init__(self, in_dim, out_dim, domain_size, modes, width):
         super(Net2d, self).__init__()
-        self.conv1 = SimpleBlock2d(in_dim, out_dim, modes, modes, width)
+        self.conv1 = SimpleBlock2d(in_dim, out_dim, domain_size, modes, modes, width)
 
     def forward(self, x):
         x = self.conv1(x)

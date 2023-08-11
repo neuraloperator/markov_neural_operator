@@ -69,7 +69,7 @@ print('preprocessing finished, time used:', t2-t1)
 device = torch.device('cuda')
 
 # Model
-model = Net2d(in_dim, out_dim, modes, width).cuda()
+model = Net2d(in_dim, out_dim, S, modes, width).cuda()
 print(model.count_params())
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-4)
