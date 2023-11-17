@@ -1,15 +1,27 @@
-s = 4096;
-%Pretend this is on the interval [0,32pi)
-x = (1:N)'/N;
-u = GRF1(N/2, 0, 2, 7, 7^2, "periodic");
-u = u(x);
+s = 512;
+%Pretend this is on the interval [0,2*pi*L)
+x = (1:s)'/s;
 
-[uu, tt] = KS(u, 32*pi, 100, 1000, 0.01);
+N = 200; % number of case
+T = 1000; % time
+t = 10000; % time steps
+u_out = zeros(N, t, s);
 
-surf(tt,x,uu');
-view([90 -90]); 
-shading interp; 
-colormap jet;
-axis tight;
-colorbar;
+for i=1:N
+    disp(i);
+    u = GRF1(s/2, 0, 2, 5, 5^2, "periodic");
+    u = u(x);
+
+    [uu, tt] = KS(u, 2*pi*32, T, t, 0.1);
+    u_out(i,:,:) = uu;
+
+%     surf(tt,x,uu');
+%     view([90 -90]); 
+%     shading interp; 
+%     colormap jet;
+%     axis tight;
+%     colorbar;
+end
+
+
 

@@ -1,4 +1,4 @@
-%Radom function from N(m, C) on [0 1] where
+%Random function from N(m, C) on [0 1] where
 %C = sigma^2(-Delta + tau^2 I)^(-gamma)
 %with periodic, zero dirichlet, and zero neumann boundary.
 %Dirichlet only supports m = 0.
