@@ -35,9 +35,12 @@ In our work, we use three different models to learn the Markovian solution opera
 
 ## Citation
 ```
-@inproceedings{MNO,
-  title={Learning Dissipative Dynamics in Chaotic Systems},
-  author={Zongyi Li and Miguel Liu-Schiaffini and Nikola B. Kovachki and Burigede Liu and Kamyar Azizzadenesheli and Kaushik Bhattacharya and Andrew Stuart and Anima Anandkumar},
+@article{MNO,
+  title={Learning chaotic dynamics in dissipative systems},
+  author={Li, Zongyi and Liu-Schiaffini, Miguel and Kovachki, Nikola and Azizzadenesheli, Kamyar and Liu, Burigede and Bhattacharya, Kaushik and Stuart, Andrew and Anandkumar, Anima},
+  journal={Advances in Neural Information Processing Systems},
+  volume={35},
+  pages={16768--16781},
   year={2022}
 }
 ```
